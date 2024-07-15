@@ -22,13 +22,14 @@ class AudioPlayService : Service() {
         const val FILENAME = "FILENAME"
         const val COMMAND = "COMMAND"
         const val PLAY = "PLAY"
+        const val PAUSE = "PAUSE"
+        const val RESUME = "RESUME"
         const val STOP = "STOP"
         const val CHANNEL_ID = "AudioPlayServiceChannel"
     }
 
     override fun onCreate() {
         super.onCreate()
-        // Configurar el HandlerThread
         handlerThread = HandlerThread("AudioPlayServiceThread")
         handlerThread.start()
         serviceHandler = Handler(handlerThread.looper)
@@ -36,7 +37,6 @@ class AudioPlayService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // Limpiar el HandlerThread
         handlerThread.quitSafely()
     }
 
@@ -48,12 +48,17 @@ class AudioPlayService : Service() {
         val filename = intent.getStringExtra(FILENAME)
         val command = intent.getStringExtra(COMMAND)
 
-        if (command == PLAY) {
-            startForegroundService()
-            serviceHandler.post { audioPlay(filename) }
-        } else if (command == STOP) {
-            serviceHandler.post { audioStop() }
-            stopForeground(true)
+        when (command) {
+            PLAY -> {
+                startForegroundService()
+                serviceHandler.post { audioPlay(filename) }
+            }
+            PAUSE -> serviceHandler.post { audioPause() }
+            RESUME -> serviceHandler.post { audioResume() }
+            STOP -> {
+                serviceHandler.post { audioStop() }
+                stopForeground(true)
+            }
         }
 
         return START_STICKY
@@ -68,11 +73,22 @@ class AudioPlayService : Service() {
                 assetFileDescriptor.startOffset,
                 assetFileDescriptor.length
             )
-
             assetFileDescriptor.close()
             mediaPlayer.prepare()
             mediaPlayer.setVolume(1f, 1f)
             mediaPlayer.isLooping = false
+            mediaPlayer.start()
+        }
+    }
+
+    private fun audioPause() {
+        if (this::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
+            mediaPlayer.pause()
+        }
+    }
+
+    private fun audioResume() {
+        if (this::mediaPlayer.isInitialized && !mediaPlayer.isPlaying) {
             mediaPlayer.start()
         }
     }

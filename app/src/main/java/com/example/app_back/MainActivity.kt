@@ -22,16 +22,32 @@ class MainActivity : ComponentActivity() {
         }
 
         val btnPlay = findViewById<Button>(R.id.play_button)
+        val btnPause = findViewById<Button>(R.id.pause_button)
+        val btnResume = findViewById<Button>(R.id.resume_button)
         val btnStop = findViewById<Button>(R.id.stop_button)
 
         btnPlay.setOnClickListener(onClickListenerPlay())
+        btnPause.setOnClickListener(onClickListenerPause())
+        btnResume.setOnClickListener(onClickListenerResume())
         btnStop.setOnClickListener(onClickListenerStop())
     }
 
     private fun onClickListenerPlay(): (View) -> Unit = {
         val audioPlayServiceIntent = Intent(applicationContext, AudioPlayService::class.java)
-        audioPlayServiceIntent.putExtra(AudioPlayService.FILENAME, "musica.mp3")
+        audioPlayServiceIntent.putExtra(AudioPlayService.FILENAME, "las_meninas.mp3")
         audioPlayServiceIntent.putExtra(AudioPlayService.COMMAND, AudioPlayService.PLAY)
+        startService(audioPlayServiceIntent)
+    }
+
+    private fun onClickListenerPause(): (View) -> Unit = {
+        val audioPlayServiceIntent = Intent(applicationContext, AudioPlayService::class.java)
+        audioPlayServiceIntent.putExtra(AudioPlayService.COMMAND, AudioPlayService.PAUSE)
+        startService(audioPlayServiceIntent)
+    }
+
+    private fun onClickListenerResume(): (View) -> Unit = {
+        val audioPlayServiceIntent = Intent(applicationContext, AudioPlayService::class.java)
+        audioPlayServiceIntent.putExtra(AudioPlayService.COMMAND, AudioPlayService.RESUME)
         startService(audioPlayServiceIntent)
     }
 
