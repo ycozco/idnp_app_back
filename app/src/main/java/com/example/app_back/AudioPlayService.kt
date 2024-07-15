@@ -1,39 +1,66 @@
 package com.example.app_back
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.media.MediaPlayer
+import android.os.Build
+import android.os.Handler
+import android.os.HandlerThread
 import android.os.IBinder
+import androidx.core.app.NotificationCompat
 
-class AudioPlayService:Service() {
-    private lateinit var mediaPlayer:MediaPlayer
+class AudioPlayService : Service() {
+    private lateinit var mediaPlayer: MediaPlayer
+    private lateinit var serviceHandler: Handler
+    private lateinit var handlerThread: HandlerThread
 
-    companion object{
-        const val FILENAME ="FILENAME"
+    companion object {
+        const val FILENAME = "FILENAME"
         const val COMMAND = "COMMAND"
         const val PLAY = "PLAY"
         const val STOP = "STOP"
+        const val CHANNEL_ID = "AudioPlayServiceChannel"
+    }
 
+    override fun onCreate() {
+        super.onCreate()
+        // Configurar el HandlerThread
+        handlerThread = HandlerThread("AudioPlayServiceThread")
+        handlerThread.start()
+        serviceHandler = Handler(handlerThread.looper)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        // Limpiar el HandlerThread
+        handlerThread.quitSafely()
     }
 
     override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
+        return null
     }
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         val filename = intent.getStringExtra(FILENAME)
         val command = intent.getStringExtra(COMMAND)
 
-        if (command == PLAY){
-                audioPlay(filename)
-        }else if(command == STOP){
-                audioStop()
+        if (command == PLAY) {
+            startForegroundService()
+            serviceHandler.post { audioPlay(filename) }
+        } else if (command == STOP) {
+            serviceHandler.post { audioStop() }
+            stopForeground(true)
         }
 
         return START_STICKY
-
     }
-    private fun audioPlay(filename:String?){
-        if (filename!=null){
+
+    private fun audioPlay(filename: String?) {
+        if (filename != null) {
             val assetFileDescriptor = assets.openFd(filename)
             mediaPlayer = MediaPlayer()
             mediaPlayer.setDataSource(
@@ -44,15 +71,42 @@ class AudioPlayService:Service() {
 
             assetFileDescriptor.close()
             mediaPlayer.prepare()
-            mediaPlayer.setVolume(1f,1f)
-            mediaPlayer.isLooping=false
+            mediaPlayer.setVolume(1f, 1f)
+            mediaPlayer.isLooping = false
             mediaPlayer.start()
-
         }
     }
-    private fun audioStop(){
-        if(mediaPlayer!=null){
+
+    private fun audioStop() {
+        if (this::mediaPlayer.isInitialized) {
             mediaPlayer.stop()
+            mediaPlayer.release()
+        }
+    }
+
+    private fun startForegroundService() {
+        createNotificationChannel()
+        val notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+        val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Reproducción de Audio")
+            .setContentText("Reproduciendo audio en segundo plano")
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentIntent(pendingIntent)
+            .build()
+
+        startForeground(1, notification)
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val serviceChannel = NotificationChannel(
+                CHANNEL_ID,
+                "Audio Play Service Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(serviceChannel)
         }
     }
 }
