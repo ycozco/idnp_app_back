@@ -54,10 +54,10 @@
                 android:id="@+id/play_button"
                 android:layout_width="100dp"
                 android:layout_height="50dp"
-                android:text="Play"
+                android:layout_marginEnd="16dp"
                 android:drawableStart="@drawable/ic_play"
                 android:drawablePadding="8dp"
-                android:layout_marginEnd="16dp" />
+                android:text="Play" />
 
             <Button
                 android:id="@+id/pause_button"
@@ -73,7 +73,7 @@
                 android:layout_width="100dp"
                 android:layout_height="50dp"
                 android:text="Resume"
-                android:drawableStart="@drawable/ic_resume"
+                android:drawableStart="@drawable/ic_notification"
                 android:drawablePadding="8dp"
                 android:layout_marginEnd="16dp" />
 

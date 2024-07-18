@@ -131,7 +131,7 @@ class AudioPlayService : Service() {
             .setContentIntent(pendingIntent)
             .addAction(R.drawable.ic_play, "Play", pendingPlayIntent)
             .addAction(R.drawable.ic_pause, "Pause", pendingPauseIntent)
-            .addAction(R.drawable.ic_resume, "Resume", pendingResumeIntent)
+            .addAction(R.drawable.ic_notification, "Resume", pendingResumeIntent)
             .addAction(R.drawable.ic_stop, "Stop", pendingStopIntent)
             .build()
 
