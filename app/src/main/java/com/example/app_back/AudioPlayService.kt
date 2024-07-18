@@ -102,13 +102,37 @@ class AudioPlayService : Service() {
 
     private fun startForegroundService() {
         createNotificationChannel()
+
+        val playIntent = Intent(this, AudioPlayService::class.java).apply {
+            putExtra(COMMAND, PLAY)
+        }
+        val pauseIntent = Intent(this, AudioPlayService::class.java).apply {
+            putExtra(COMMAND, PAUSE)
+        }
+        val resumeIntent = Intent(this, AudioPlayService::class.java).apply {
+            putExtra(COMMAND, RESUME)
+        }
+        val stopIntent = Intent(this, AudioPlayService::class.java).apply {
+            putExtra(COMMAND, STOP)
+        }
+
+        val pendingPlayIntent = PendingIntent.getService(this, 0, playIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingPauseIntent = PendingIntent.getService(this, 1, pauseIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingResumeIntent = PendingIntent.getService(this, 2, resumeIntent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingStopIntent = PendingIntent.getService(this, 3, stopIntent, PendingIntent.FLAG_IMMUTABLE)
+
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE)
+
         val notification: Notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Reproducción de Audio")
             .setContentText("Reproduciendo audio en segundo plano")
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(pendingIntent)
+            .addAction(R.drawable.ic_play, "Play", pendingPlayIntent)
+            .addAction(R.drawable.ic_pause, "Pause", pendingPauseIntent)
+            .addAction(R.drawable.ic_resume, "Resume", pendingResumeIntent)
+            .addAction(R.drawable.ic_stop, "Stop", pendingStopIntent)
             .build()
 
         startForeground(1, notification)
