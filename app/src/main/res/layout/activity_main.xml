@@ -52,38 +52,42 @@
 
             <Button
                 android:id="@+id/play_button"
-                android:layout_width="100dp"
+                android:layout_width="50dp"
                 android:layout_height="50dp"
                 android:layout_marginEnd="16dp"
-                android:drawableStart="@drawable/ic_play"
-                android:drawablePadding="8dp"
-                android:text="Play" />
+                android:background="@drawable/play_ic"
+
+                android:drawablePadding="10dp"
+                android:padding="10dp"
+                android:scaleType="fitCenter" />
 
             <Button
                 android:id="@+id/pause_button"
-                android:layout_width="100dp"
+                android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:text="Pause"
-                android:drawableStart="@drawable/ic_pause"
-                android:drawablePadding="8dp"
-                android:layout_marginEnd="16dp" />
+                android:background="@drawable/pausa_ic"
+                android:drawablePadding="10dp"
+                android:padding="10dp"
+                android:scaleType="fitCenter" />
 
             <Button
                 android:id="@+id/resume_button"
-                android:layout_width="100dp"
+                android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:text="Resume"
-                android:drawableStart="@drawable/ic_notification"
-                android:drawablePadding="8dp"
-                android:layout_marginEnd="16dp" />
+                android:background="@drawable/reanudar_ic"
+                android:drawablePadding="10dp"
+                android:padding="10dp"
+                android:scaleType="fitCenter" />
 
             <Button
                 android:id="@+id/stop_button"
-                android:layout_width="100dp"
+                android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:text="Stop"
-                android:drawableStart="@drawable/ic_stop"
-                android:drawablePadding="8dp" />
+
+                android:background="@drawable/stop_ic"
+                android:drawablePadding="10dp"
+                android:padding="10dp"
+                android:scaleType="fitCenter"/>
         </LinearLayout>
     </RelativeLayout>
 

@@ -28,10 +28,12 @@
         <service
             android:name=".AudioPlayService"
             android:foregroundServiceType="mediaPlayback"
+            android:exported="false"
             tools:ignore="ForegroundServicePermission" />
     </application>
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
 </manifest>

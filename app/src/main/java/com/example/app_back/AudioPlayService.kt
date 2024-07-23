@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
+import android.util.Log
 
 class AudioPlayService : Service() {
     private lateinit var mediaPlayer: MediaPlayer
@@ -33,11 +34,15 @@ class AudioPlayService : Service() {
         handlerThread = HandlerThread("AudioPlayServiceThread")
         handlerThread.start()
         serviceHandler = Handler(handlerThread.looper)
+        createNotificationChannel()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         handlerThread.quitSafely()
+        if (this::mediaPlayer.isInitialized) {
+            mediaPlayer.release()
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -78,18 +83,21 @@ class AudioPlayService : Service() {
             mediaPlayer.setVolume(1f, 1f)
             mediaPlayer.isLooping = false
             mediaPlayer.start()
+            Log.d("AudioPlayService", "Playing audio: $filename")
         }
     }
 
     private fun audioPause() {
         if (this::mediaPlayer.isInitialized && mediaPlayer.isPlaying) {
             mediaPlayer.pause()
+            Log.d("AudioPlayService", "Pausing audio")
         }
     }
 
     private fun audioResume() {
         if (this::mediaPlayer.isInitialized && !mediaPlayer.isPlaying) {
             mediaPlayer.start()
+            Log.d("AudioPlayService", "Resuming audio")
         }
     }
 
@@ -97,6 +105,7 @@ class AudioPlayService : Service() {
         if (this::mediaPlayer.isInitialized) {
             mediaPlayer.stop()
             mediaPlayer.release()
+            Log.d("AudioPlayService", "Stopping audio")
         }
     }
 
@@ -129,10 +138,10 @@ class AudioPlayService : Service() {
             .setContentText("Reproduciendo audio en segundo plano")
             .setSmallIcon(R.drawable.ic_notification)
             .setContentIntent(pendingIntent)
-            .addAction(R.drawable.ic_play, "Play", pendingPlayIntent)
-            .addAction(R.drawable.ic_pause, "Pause", pendingPauseIntent)
-            .addAction(R.drawable.ic_notification, "Resume", pendingResumeIntent)
-            .addAction(R.drawable.ic_stop, "Stop", pendingStopIntent)
+            .addAction(R.drawable.play_ic, "Play", pendingPlayIntent)
+            .addAction(R.drawable.pausa_ic, "Pause", pendingPauseIntent)
+            .addAction(R.drawable.reanudar_ic, "Resume", pendingResumeIntent)
+            .addAction(R.drawable.stop_ic, "Stop", pendingStopIntent)
             .build()
 
         startForeground(1, notification)
